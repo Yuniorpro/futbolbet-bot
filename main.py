@@ -1,46 +1,44 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    ContextTypes,
+    CallbackQueryHandler,
+    MessageHandler,
+    filters,
+)
+import os
+from dotenv import load_dotenv
 
-# TOKEN DEL BOT
-TOKEN = "7741456689:AAEReltV6xcKmuvmOy1U8NJtkBvcpGR2o6U"
+# Cargar variables de entorno
+load_dotenv()
+TOKEN = os.getenv("TOKEN")
 
-# Comando /start
+# Comandos
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "👋 ¡Bienvenido al bot de apuestas!\nUsa /tips para recibir recomendaciones."
-    )
+    await update.message.reply_text("¡Hola! Bienvenido al bot.")
 
-# Comando /tips
 async def tips(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "⚽ Aquí van los tips del día:\n1. Gana Flamengo\n2. Over 2.5 goles en Palmeiras\n3. Empate Fluminense"
-    )
+    await update.message.reply_text("Aquí van algunos tips útiles...")
 
-# Comando /comandos
 async def comandos(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [
-        [InlineKeyboardButton("Tips", callback_data='tips')],
-        [InlineKeyboardButton("Contacto", callback_data='contacto')]
+    botones = [
+        [InlineKeyboardButton("Tip 1", callback_data="tip1")],
+        [InlineKeyboardButton("Tip 2", callback_data="tip2")]
     ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text('📋 Elige una opción:', reply_markup=reply_markup)
+    reply_markup = InlineKeyboardMarkup(botones)
+    await update.message.reply_text("Selecciona una opción:", reply_markup=reply_markup)
 
-# Manejador de botones
 async def botones(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+    await query.edit_message_text(text=f"Seleccionaste: {query.data}")
 
-    if query.data == 'tips':
-        await query.edit_message_text("🎯 Tips rápidos:\n- Gana Inter Miami\n- Menos de 2.5 goles en São Paulo")
-    elif query.data == 'contacto':
-        await query.edit_message_text("📩 Contáctanos en @TuCanalTelegram")
-
-# Mensaje de bienvenida a nuevos usuarios
 async def bienvenida(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for miembro in update.message.new_chat_members:
-        await update.message.reply_text(f"🎉 ¡Bienvenido {miembro.full_name} al canal!")
+        await update.message.reply_text(f"¡Bienvenido {miembro.full_name} al grupo!")
 
-# Función principal
+# Main
 def main():
     app = ApplicationBuilder().token(TOKEN).build()
 
@@ -50,7 +48,6 @@ def main():
     app.add_handler(CallbackQueryHandler(botones))
     app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, bienvenida))
 
-    print("🤖 Bot iniciado correctamente...")
     app.run_polling()
 
 if __name__ == '__main__':
