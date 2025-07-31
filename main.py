@@ -1,18 +1,15 @@
-import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
-    ContextTypes,
     CallbackQueryHandler,
     MessageHandler,
-    filters,
+    ContextTypes,
+    filters
 )
-from dotenv import load_dotenv
 
-# Cargar variables de entorno
-load_dotenv()
-TOKEN = os.getenv("TOKEN")
+# Token fijo (puedes luego moverlo a una variable de entorno por seguridad)
+TOKEN = "7741456689:AAEReltV6xcKmuvmOy1U8NJtkBvcpGR2o6U"
 
 # Comando /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -37,12 +34,12 @@ async def botones(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     await query.edit_message_text(text=f"Seleccionaste: {query.data}")
 
-# Mensaje de bienvenida cuando alguien entra al grupo
+# Bienvenida a nuevos miembros
 async def bienvenida(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for miembro in update.message.new_chat_members:
         await update.message.reply_text(f"¡Bienvenido {miembro.full_name} al grupo!")
 
-# Lanzar aplicación
+# MAIN
 def main():
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
